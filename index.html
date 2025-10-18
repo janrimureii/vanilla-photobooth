@@ -27,6 +27,7 @@
             .video-cam-container video {
                 border-radius: 20px;
                 border: #000000 solid 3px;
+                max-width: 700px;
             }
 
             .download-btn-container{
@@ -51,6 +52,71 @@
             button:hover {
                 background-color: #09487f;
             }
+            video {
+                transform: scaleX(1);
+            }
+
+            @media (max-width: 768px) {
+                html {
+                    background: linear-gradient(to bottom, #A4E8FF, #FFFFFF);
+                }
+
+                .photo-preview-container {
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .video-cam-container {
+                    left: 0;
+                    text-align: center;
+                }
+
+                .video-cam-container h3 {
+                    font-size: 28px;
+                }
+
+                .video-cam-container video {
+                    width: 90%;
+                    max-width: 350px;
+                    height: auto;
+                }
+
+                .captured-Photo-container {
+                    left: 0;
+                    right: 0;
+                    top: 20px;
+                    flex-direction: row;
+                    justify-content: center;
+                    gap: 10px;
+                    padding: 10px 0;
+                    overflow-x: auto;       
+                    overflow-y: hidden;    
+                    scroll-behavior: smooth;
+                    white-space: nowrap;    
+                    width: 100%;
+                    box-sizing: border-box;
+                }
+
+                .captured-Photo-container img {
+                    width: 90px;
+                    margin: 5px;
+                }
+
+                .download-btn-container {
+                    left: 0;
+                    text-align: center;
+                    top: 3rem;
+                }
+
+                .download-btn-container button {
+                    font-size: 16px;
+                    padding: 8px 16px;
+                    border-radius: 30px;
+                    margin: 10px;
+                }
+            }
+
     </style>
 </head>
 <body>
@@ -59,7 +125,7 @@
             
             <div class="video-cam-container">
                 <h3 class="top-label">Navi Pixels</h3>
-                <video id="video" autoplay playsinline style="width:700px;"></video>
+                <video id="video" autoplay playsinline></video>
             </div>
 
 
@@ -174,7 +240,7 @@
 
             for (let i = photoCount; i < 4; i++) {
                 await takeSinglePhoto();
-                await new Promise((r) => setTimeout(r, 1000)); // short pause between photos
+                await new Promise((r) => setTimeout(r, 1000)); 
             }
 
             countdownElement.remove();
@@ -184,61 +250,48 @@
 
             async function downloadPhotos() {
             if (photosArray.length === 0) {
-                    alert("No photos to download!");
-                    return;
-                }
+                alert("No photos to download!");
+                return;
+            }
 
-                const singleWidth = 300;   
-                const singleHeight = 225;  
-                const border = 10;         
-                const textHeight = 40;    
+            const singleWidth = 300;   
+            const singleHeight = 225;  
+            const border = 10;         
+            const textHeight = 60;    
 
+            const canvas = document.createElement('canvas');
+            canvas.width = singleWidth + border * 2;
+            canvas.height = singleHeight * photosArray.length + border * (photosArray.length + 1) + textHeight;
 
-                const canvas = document.createElement('canvas');
-                canvas.width = singleWidth * 2 + border * 3;
-                canvas.height = singleHeight * 2 + border * 3 + textHeight;
+            const ctx = canvas.getContext('2d');
 
-                const ctx = canvas.getContext('2d');
+            ctx.fillStyle = "#aadef2";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            for (let i = 0; i < photosArray.length; i++) {
+                const img = new Image();
+                img.src = photosArray[i];
 
-                ctx.fillStyle = "#aadef2ff";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                await new Promise((resolve) => {
+                img.onload = () => {
+                    const x = border;
+                    const y = border + i * (singleHeight + border);
+                    ctx.drawImage(img, x, y, singleWidth, singleHeight);
+                    resolve();
+                };
+                });
+            }
 
+            ctx.fillStyle = "#000";
+            ctx.font = "bold 32px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("Navi Pixels", canvas.width / 2, canvas.height - textHeight / 3);
 
-                for (let i = 0; i < photosArray.length; i++) {
-                    const img = new Image();
-                    img.src = photosArray[i];
-
-                    await new Promise((resolve) => {
-                        img.onload = () => {
-                            const col = i % 2;
-                            const row = Math.floor(i / 2);
-
-                            const x = border + col * (singleWidth + border);
-                            const y = border + row * (singleHeight + border);
-
-                            ctx.drawImage(img, x, y, singleWidth, singleHeight);
-                            resolve();
-                        };
-                    });
-                }
-
-            
-                ctx.fillStyle = "#000000"; 
-                ctx.font = "30px Arial";
-                ctx.textAlign = "center";
-                ctx.fillText(
-                    "Navi Pixels", 
-                    canvas.width / 2, 
-                    canvas.height - textHeight / 2
-                );
-
-
-                const finalImage = canvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.href = finalImage;
-                link.download = 'photobooth.png';
-                link.click();
+            const finalImage = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = finalImage;
+            link.download = 'photobooth-strip.png';
+            link.click();
             }
     </script>
 </body>
