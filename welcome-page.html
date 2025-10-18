@@ -1,0 +1,24 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vanilla - Photobooth</title>
+     <link rel="stylesheet" href="/welcome-page.css">
+</head>
+<body>
+    <div class="welcome-page-main-container">
+        <div class="welcome-messages">
+            <h3>Navi Pixels</h3>
+            <p>An Online Photobooth</p>
+            <button type="button" id="BtnToPhotoboothPage" class="btn-to-photobooth-page">START</button>
+        </div>
+    </div>
+
+    <script>
+        const start = document.getElementById("BtnToPhotoboothPage");
+        start.addEventListener('click', () => {
+            window.location.href = '/photobooth-page.html';
+        })
+    </script>
+</body>
+</html>
